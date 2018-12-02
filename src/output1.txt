@@ -3,4 +3,4 @@ yes
 2 3 0.8 1.2
 3 4 1 1.5
 4 1 1 0.5
-one kg of 1 gets 1.0125 kg of 1 from the above sequence.
+one kg of product 1 gets 1.0125 kg of product 1 from the above sequence.

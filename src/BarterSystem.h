@@ -25,10 +25,11 @@ public:
   BarterSystem(int productCount);
 
   //define methods
-  void traverse(int vertex, std::string sequence, double runningAmount);
+  void traverse(int vertex, std::string sequence, double runningAmount, std::vector<std::vector<int> > localAdjList);
 
   //define helper methods
   std::string intToString(int integer);
+  bool containsCycle(std::string sequence);
 };
 
 #endif

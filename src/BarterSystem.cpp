@@ -2,6 +2,7 @@
 #include <iostream>//cout
 #include <vector>//vector
 #include <stdio.h>//sprintf
+#include <algorithm>//sort
 
 #include "BarterSystem.h"
 
@@ -23,18 +24,41 @@ std::string BarterSystem::intToString(int integer)
     return (std::string) characters;
 }
 
-void BarterSystem::traverse(int vertex, std::string sequence, double runningAmount)
+bool BarterSystem::containsCycle(std::string sequence)
 {
+  // check if the sequence is large enough for a cycle
+  if(sequence.size() < 1)
+  {
+    return false;
+  }
+
+  // sort the sequence
+  std::sort(sequence.begin(), sequence.end());
+
+  for(int z = 0;z < sequence.length();z++)
+  {
+    if(sequence[z] == sequence[z + 1])
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+void BarterSystem::traverse(int vertex, std::string sequence, double runningAmount, std::vector<std::vector<int> > localAdjList)
+{
+  std::cout << "Checking vertex: " << vertex << std::endl;
+  std::cout << "Current sequence: " << sequence << std::endl;
+
   //check if a recursive instance has already found the market to be inefficient
   if(this->stopSignal)
   {
     return;
   }
 
-  std::cout << "OUT " << vertex << std::endl;
-
   //check if a loop has occured
-  if((sequence[0] - '0') == vertex && sequence.size() > 1)
+  if(this->containsCycle(sequence))
   {
     if(runningAmount > this->startingAmount)
     {
@@ -49,17 +73,17 @@ void BarterSystem::traverse(int vertex, std::string sequence, double runningAmou
     return;
   }
 
-  while(this->adjList[vertex].size() > 0)
+
+  while(localAdjList[vertex].size() > 0)
   {
     //get the first element
-    int newVertex = this->adjList[vertex].front();
-    std::cout << "IN " << newVertex << std::endl;
+    int newVertex = localAdjList[vertex].front();
     std::string newSequence = sequence + this->intToString(newVertex);
     double newRunningAmount = runningAmount * this->exchangeRatio[vertex][newVertex];
 
     //remove newVertex from adjList to prevent endlessly looping
-    this->adjList[vertex].erase(this->adjList[vertex].begin());
+    localAdjList[vertex].erase(localAdjList[vertex].begin());
 
-    this->traverse(newVertex, newSequence, newRunningAmount);
+    this->traverse(newVertex, newSequence, newRunningAmount, localAdjList);
   }
 }
