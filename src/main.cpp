@@ -5,6 +5,7 @@
 
 #include "BarterSystem.cpp"
 
+// converts an int to string - allows for the usage of this file without c++11
 std::string intToString(int integer)
 {
     char characters[32];
@@ -14,31 +15,38 @@ std::string intToString(int integer)
 
 int main()
 {
+  // pretty newline
   std::cout << std::endl;
 
   std::ifstream inputFile;
 
   for(int z = 1;z <= 4;z++)
   {
+    // debugging output - denote the start of an inputFile test
     std::cout << "TEST: " << z << " start" << std::endl;
 
+    // generate filePath and utilize to open inputFile
     std::string filePath = "./input" + intToString(z) + ".txt";
     inputFile.open(filePath.c_str());
 
+    // check if inputFile open operation succeeded
     if(!inputFile)
     {
       std::cout << "Unable to open file" << std::endl;
       exit(1);
     }
 
+    // pull the productCount from the inputFile
     int productCount;
     inputFile >> productCount;
 
     // init barterSystem with productCount
     BarterSystem barterSystem(productCount);
 
+    // temp var for while loop conditional
     int check;
-    //if the inputFile no longer has anything to output, exit loop
+
+    // if the inputFile no longer has anything to output, exit loop
     while(inputFile >> check)
     {
       // init
@@ -46,7 +54,6 @@ int main()
       int productEnd;
       double productStartAmount;
       double productEndAmount;
-      double productMaxAmount;
       double productRatio;
 
       // populate
@@ -57,37 +64,38 @@ int main()
 
       // calculate
       productRatio = productEndAmount / productStartAmount;
-      productMaxAmount = std::max(productStartAmount, productEndAmount);
 
       // decrement to 0 indexed values
       productStart--;
       productEnd--;
 
+      // debugging output for verifying data pulled from from inputFile
       // std::cout << "productStart: " << productStart << std::endl;
       // std::cout << "productEnd: " << productEnd << std::endl;
       // std::cout << "productStartAmount: " << productStartAmount << std::endl;
       // std::cout << "productEndAmount: " << productEndAmount << std::endl;
       // std::cout << "productRatio: " << productRatio << std::endl;
       // std::cout << "productMaxAmount: " << productMaxAmount << std::endl;
-      // std::cout << "startingAmountBefore: " << barterSystem.startingAmount << std::endl;
 
       // update
       barterSystem.adjList[productStart].push_back(productEnd);
       barterSystem.exchangeRatio[productStart][productEnd] = productRatio;
       barterSystem.startingAmounts[productStart] = productStartAmount;
       barterSystem.endingAmounts[productEnd] = productEndAmount;
-      barterSystem.startingAmount += productMaxAmount;
-
-      // std::cout << "startingAmountAfter: " << barterSystem.startingAmount << std::endl;
-      // std::cout << std::endl;
     }
 
-    // std::cout << std::endl;
-
+    // close the file
     inputFile.close();
 
+    // begin custom recursive DFS traversal
     barterSystem.traverse(0, "0", barterSystem.startingAmount, barterSystem.adjList);
 
+    if(!barterSystem.stopSignal)
+    {
+      // efficient market - worst case
+    }
+
+    // debugging output - denote the end of a inputFile test
     std::cout << "TEST: " << z << " end" << std::endl << std::endl;
   }
 

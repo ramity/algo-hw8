@@ -9,6 +9,7 @@
 BarterSystem::BarterSystem(int productCount)
 {
   this->productCount = productCount;
+  this->startingAmount = 1.0;
   this->adjList.resize(productCount,std::vector<int>());
   this->exchangeRatio.resize(productCount,std::vector<double>(productCount, 0));
   this->startingAmounts.resize(productCount, 0);
@@ -74,7 +75,7 @@ void BarterSystem::traverse(int vertex, std::string sequence, double runningAmou
   }
 
 
-  while(localAdjList[vertex].size() > 0)
+  while(localAdjList[vertex].size() > 0 && !this->stopSignal)
   {
     //get the first element
     int newVertex = localAdjList[vertex].front();
