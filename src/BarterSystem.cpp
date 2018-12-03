@@ -49,40 +49,71 @@ bool BarterSystem::containsCycle(std::string sequence)
 
 void BarterSystem::traverse(int vertex, std::string sequence, double runningAmount, std::vector<std::vector<int> > localAdjList)
 {
-  std::cout << "Checking vertex: " << vertex << std::endl;
+  std::cout << "*Checking vertex: " << vertex << std::endl;
   std::cout << "Current sequence: " << sequence << std::endl;
+  std::cout << "Running amount: " << runningAmount << std::endl;
 
-  //check if a recursive instance has already found the market to be inefficient
-  if(this->stopSignal)
-  {
-    return;
-  }
-
-  //check if a loop has occured
+  // check if the sequence contains a cycle
   if(this->containsCycle(sequence))
   {
     if(runningAmount > this->startingAmount)
     {
-      this->stopSignal = true;
+      std::string localSequence;
+      double localRunningAmount;
 
-      std::cout << "Inefficient market detected:" << std::endl;
-      std::cout << sequence << std::endl;
-      std::cout << runningAmount << std::endl;
+      if(sequence[0] != sequence[sequence.length()])
+      {
+        // the sequence does not start at 0
+        bool start = false;
+        localRunningAmount = 1.0;
+
+        // prove that the cycle is profitable
+        for(int key = 0;key < sequence.length() - 1;key++)
+        {
+          if(sequence[key] == sequence[sequence.length() - 1] || start)
+          {
+            start = true;
+
+            int localVertex = (sequence[key] - '0');
+            int localNewVertex = (sequence[key + 1] - '0');
+            localSequence += sequence[key];
+
+            localRunningAmount = localRunningAmount * this->exchangeRatio[localVertex][localNewVertex];
+          }
+        }
+
+        localSequence += sequence[sequence.length() - 1];
+      }
+      else
+      {
+        // the sequence starts at 0
+        localSequence = sequence;
+        localRunningAmount = runningAmount;
+      }
+
+      if(localRunningAmount > this->startingAmount)
+      {
+        this->stopSignal = true;
+
+        std::cout << "Inefficient market detected:" << std::endl;
+        std::cout << localSequence << std::endl;
+        std::cout << runningAmount << std::endl;
+      }
     }
 
-    //prevent further execution
+    // prevent further execution
     return;
   }
 
 
   while(localAdjList[vertex].size() > 0 && !this->stopSignal)
   {
-    //get the first element
+    // get the first element
     int newVertex = localAdjList[vertex].front();
     std::string newSequence = sequence + this->intToString(newVertex);
     double newRunningAmount = runningAmount * this->exchangeRatio[vertex][newVertex];
 
-    //remove newVertex from adjList to prevent endlessly looping
+    // remove newVertex from adjList to prevent endlessly looping
     localAdjList[vertex].erase(localAdjList[vertex].begin());
 
     this->traverse(newVertex, newSequence, newRunningAmount, localAdjList);
