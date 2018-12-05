@@ -19,7 +19,7 @@ int main()
   // pretty newline
   std::cout << std::endl;
 
-  for(int z = 1;z <= 6;z++)
+  for(int z = 1;z <= 4;z++)
   {
     // debugging output - denote the start of an inputFile test
     std::cout << "TEST: " << z << " start" << std::endl;
